@@ -4,9 +4,9 @@ import {
   signInWithPopup, 
   signOut, 
   signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  User
+  createUserWithEmailAndPassword
 } from 'firebase/auth'
+import type { User } from 'firebase/auth'
 import { auth, googleProvider } from '../lib/firebase'
 
 const AuthContext = createContext<any>(null)
@@ -18,14 +18,12 @@ export function AuthProvider({ children }: any) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Escucha cambios de Google Firebase
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       console.log('AUTH EVENT FIREBASE:', firebaseUser?.email)
       setUser(firebaseUser)
       setLoading(false)
       
       if (firebaseUser) {
-        // Puedes crear perfil local simple
         setProfile({
           id: firebaseUser.uid,
           email: firebaseUser.email,
@@ -54,7 +52,6 @@ export function AuthProvider({ children }: any) {
     try {
       await signInWithEmailAndPassword(auth, email, password)
     } catch (error: any) {
-      // Si no existe, la crea
       if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
         try {
           await createUserWithEmailAndPassword(auth, email, password)
